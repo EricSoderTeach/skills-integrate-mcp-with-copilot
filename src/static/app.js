@@ -1,4 +1,68 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Register creation form logic
+  const registerForm = document.getElementById("register-form");
+  const registerMessageDiv = document.getElementById("register-message");
+  const registersContainer = document.createElement("section");
+  registersContainer.id = "registers-container";
+  registersContainer.innerHTML = `<h3>Created Registers</h3><ul id="registers-list"></ul>`;
+  document.body.insertBefore(registersContainer, document.getElementById("activities-container"));
+
+  async function fetchRegisters() {
+    try {
+      const response = await fetch("/registers");
+      const registers = await response.json();
+      const registersList = document.getElementById("registers-list");
+      registersList.innerHTML = "";
+      if (registers.length === 0) {
+        registersList.innerHTML = "<li>No registers created yet.</li>";
+      } else {
+        registers.forEach((reg) => {
+          const li = document.createElement("li");
+          li.textContent = `${reg.date} | ${reg.session} | Year ${reg.year_group} | ${reg.subject} | ${reg.class_name}`;
+          registersList.appendChild(li);
+        });
+      }
+    } catch (error) {
+      // fail silently
+    }
+  }
+
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const date = document.getElementById("register-date").value;
+      const session = document.getElementById("register-session").value;
+      const year_group = document.getElementById("register-year-group").value;
+      const subject = document.getElementById("register-subject").value;
+      const class_name = document.getElementById("register-class").value;
+      try {
+        const response = await fetch("/registers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, session, year_group, subject, class_name })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          registerMessageDiv.textContent = result.message;
+          registerMessageDiv.className = "success";
+          registerForm.reset();
+          fetchRegisters();
+        } else {
+          registerMessageDiv.textContent = result.detail || "An error occurred";
+          registerMessageDiv.className = "error";
+        }
+        registerMessageDiv.classList.remove("hidden");
+        setTimeout(() => {
+          registerMessageDiv.classList.add("hidden");
+        }, 5000);
+      } catch (error) {
+        registerMessageDiv.textContent = "Failed to create register. Please try again.";
+        registerMessageDiv.className = "error";
+        registerMessageDiv.classList.remove("hidden");
+      }
+    });
+    fetchRegisters();
+  }
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");

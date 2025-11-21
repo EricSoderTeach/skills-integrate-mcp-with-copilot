@@ -19,6 +19,9 @@ current_dir = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=os.path.join(Path(__file__).parent,
           "static")), name="static")
 
+from typing import List, Dict, Optional
+from pydantic import BaseModel
+
 # In-memory activity database
 activities = {
     "Chess Club": {
@@ -75,7 +78,41 @@ activities = {
         "max_participants": 12,
         "participants": ["charlotte@mergington.edu", "henry@mergington.edu"]
     }
+
 }
+
+# In-memory register database
+registers = []
+
+# Register model
+class Register(BaseModel):
+    date: str
+    session: str
+    year_group: str
+    subject: str
+    class_name: str
+
+
+# Endpoint to get all registers
+@app.get("/registers")
+def get_registers():
+    return registers
+
+# Endpoint to create a new register
+@app.post("/registers")
+def create_register(register: Register):
+    # Prevent duplicate: same date, session, year_group, subject, class_name
+    for r in registers:
+        if (
+            r['date'] == register.date and
+            r['session'] == register.session and
+            r['year_group'] == register.year_group and
+            r['subject'] == register.subject and
+            r['class_name'] == register.class_name
+        ):
+            raise HTTPException(status_code=400, detail="Register already exists for this session.")
+    registers.append(register.dict())
+    return {"message": "Register created successfully.", "register": register}
 
 
 @app.get("/")

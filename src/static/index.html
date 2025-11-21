@@ -13,6 +13,40 @@
     </header>
 
     <main>
+
+      <section id="register-creation-container">
+        <h3>Create a New Register</h3>
+        <form id="register-form">
+          <div class="form-group">
+            <label for="register-date">Date:</label>
+            <input type="date" id="register-date" required />
+          </div>
+          <div class="form-group">
+            <label for="register-session">Session:</label>
+            <select id="register-session" required>
+              <option value="">-- Select session --</option>
+              <option value="morning">Morning</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="evening">Evening</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="register-year-group">Year Group:</label>
+            <input type="text" id="register-year-group" required placeholder="e.g. 10" />
+          </div>
+          <div class="form-group">
+            <label for="register-subject">Subject:</label>
+            <input type="text" id="register-subject" required placeholder="e.g. Math" />
+          </div>
+          <div class="form-group">
+            <label for="register-class">Class:</label>
+            <input type="text" id="register-class" required placeholder="e.g. 10A" />
+          </div>
+          <button type="submit">Create Register</button>
+        </form>
+        <div id="register-message" class="hidden"></div>
+      </section>
+
       <section id="activities-container">
         <h3>Available Activities</h3>
         <div id="activities-list">
